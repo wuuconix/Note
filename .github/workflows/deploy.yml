@@ -23,3 +23,31 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/.vitepress/dist
+
+      - name: Add KEY               #这里需要提供一个ssh私钥，用你平时常用机器里的 ~/.ssh/id_rsa即可
+        env:
+          SSH_PRIVATE: ${{ secrets.SSH_PRIVATE }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE" > ~/.ssh/id_rsa
+          chmod 700 -R ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          git config --global user.email "1521900139@qq.com"
+          git config --global user.name "wuuconix"
+
+      - name: executing remote ssh commands using password  #把原先文件夹里内容删掉
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ALIYUN_HOST }}
+          username: ${{ secrets.ALIYUN_USER }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+          script: rm -rf /var/www/note/dist
+      
+      - name: copy file via ssh password                    #把build出的内容通过scp上传到阿里云服务器
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.ALIYUN_HOST }}
+          username: ${{ secrets.ALIYUN_USER }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+          source: "docs/.vitepress/dist"
+          target: "/var/www/note/"
