@@ -49,5 +49,5 @@ jobs:
           host: ${{ secrets.ALIYUN_HOST }}
           username: ${{ secrets.ALIYUN_USER }}
           password: ${{ secrets.ALIYUN_PASSWORD }}
-          source: "docs/.vitepress/dist"
+          source: "./docs/.vitepress/dist"
           target: "/var/www/note/"
